@@ -1,0 +1,67 @@
+---
+title: "Stock_data_retrieve"
+output: pdf_document
+---
+
+
+```{r}
+# retieves all the sp500 constituents stock historic prices(504 stocks)
+rm(list = ls())
+require('quantmod')
+require('xts')
+
+# change here
+setwd('/Users/zhenyuanliu/Dropbox/Spring2017/stat222/portfolio') 
+# change here
+spComp <- read.csv("sp500_constituents.csv" )
+dateStart <- "1986-01-01"  # change start data here             
+dateEnd <- "2016-01-01"  # change end data here  
+num_data <- 360 # change total number of records for each stock here
+
+symbols <- as.character(spComp[, 1]) # symbol of 504 sp500 stocks
+nAss <- length(symbols)
+all_data <- matrix(0, num_data, 1) 
+all_symbols <- c("empty")
+num_notdownloadble <- 0
+num_no_full_records <- 0
+for (i in 1:nAss){
+     j = symbols[i]
+     #str1 <- paste("apply.monthly(" , j , ", function(x) x[1])[,6]")   #first adjusted price of each month
+     str1 <- paste("monthlyReturn(", j, ")") # monthly return 
+     tryCatch({
+          getSymbols(j, src = "yahoo", from = as.Date(dateStart), to = as.Date(dateEnd))
+          haha <- eval(parse(text = str1)) # this is stupid, but what else can i do?
+          price_monthly <- as.matrix(haha)
+          rm(haha)
+          removeSymbols()
+          if(dim(price_monthly)[1] == num_data){
+               all_data <- cbind(all_data, price_monthly)
+               all_symbols <- c(all_symbols, j)
+          } else{
+            num_no_full_records <- num_no_full_records + 1
+            cat("Symbol '", j, "' doesn't have full records\n", sep = "")
+          }
+       },
+       error = function(err) {
+         num_notdownloadble <- num_notdownloadble + 1# this is not correct somehow
+         cat("Symbol '", j, "' not downloadable!\n", sep = "")
+       }
+     )
+}
+# post processing the data to monthly return and then write to csv
+all_symbols <- all_symbols
+all_data <- all_data[,-1] # the first column is used make a matrix, delete it now
+write.table(all_data, file = "sp500_monthlyreturn_19860101_20160101_withnames.csv", sep=",")
+write.table(all_data, file = "sp500_monthlyreturn_19860101_20160101_nonames.csv", row.names = F, col.names=F, sep=",")
+
+```
+
+```{r}
+# other tests here
+getSymbols("^GSPC", src = "yahoo", from = as.Date(dateStart), to = as.Date(dateEnd))
+sp500_monthly <- as.matrix(monthlyReturn(GSPC))
+write.table(sp500_monthly[61:72], file = "sp500_monthlyreturn_1991.csv", row.names = F, col.names=F, sep=",")          
+
+
+```
+
