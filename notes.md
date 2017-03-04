@@ -1,3 +1,19 @@
+**Thursday, 3/2**
+
+* Ideas
+  * **Dashboard:** displaying the output of various optimization scenarios with some input user control:
+    * e.g., User can decide whether they want to optimize on VaR vs., Sharpe Ratio vs. Mean-Variance.
+    * e.g., User can choose long-only or allowing shorts, a leverage range, or a number of securities to max out at
+    * e.g., User can manually adjust weights
+  * **Old vs. New:** Compare traditional portfolio optimization techniques such as Mean-Variance with technique that rely on Machine Learning
+    * Could use modern machine learning techniques (E.g., CART, Random Forest, Boosted Trees, Neural Networks) to incorporate features from a variety of sources
+    * Metadata from the company (e.g., P/E ratio relative to the industry), sentiment from social media, industry sector data 
+* What do we want to work on next week?
+  * **Matthew:** Additional sources of data. Getting up to speed on Python.
+  * **Josiah:** Factor covariance modeling, data visualizations for comparing portfolios
+  * **Zhenyuan:** Value-at-risk optimization
+  * **All:** Any good articles on using machine learning within portfolio optimization. Continue learning about (convex) optimization. 
+
 
 
 **Thursday, 2/9**
