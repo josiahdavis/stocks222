@@ -3,6 +3,7 @@ import numpy as np
 import cvxpy as cvx
 import matplotlib.pyplot as plt
 
+
 training_years = 5 # number of years used to estimate the expected return and covariance matrix
 test_years = 1 # number of years to keep the portfolio run
 year_start = 1991 # the first year to run the portfolio, 1991 because the data starts from 19860101
@@ -94,6 +95,7 @@ if __name__ == "__main__":
     tau_optimal_year = np.zeros((1, N_years))
     monthly_return_year = np.zeros((12, N_years))
     monthly_return_equal_year = np.zeros((12, N_years))
+    num_assets = np.zeros((1, N_years))
     #
     for year in range(year_start, year_end):
         print ('current year is ' + str(year))
@@ -105,43 +107,36 @@ if __name__ == "__main__":
             myoptimal_x.shape = (myoptimal_x.shape[0],)
             x_optimal_year_tau[:,i ,year - year_start] = myoptimal_x
         # uncomment the below lines to output the full results for each year    
-        #filename = 'minimize_variance_' + str(year) + '.csv'
-        #np.savetxt(filename, x_optimal_year_tau[:,:, year - year_start], delimiter=",")
-        
-        # choose from different taus the optimal model (no short > small tau > max return)
+        filename = 'minimize_variance_' + str(year) + '.csv'
+        np.savetxt(filename, x_optimal_year_tau[:,:, year - year_start], delimiter=",")
+    # choose the best tau for each year    
         tau_optimal_index = 0
-        mean_optimal = 0
+        sr_optimal = -9999
         for i in range(N_tau):
             tmp = x_optimal_year_tau[:,i ,year - year_start]
             tmp2 = tmp[tmp >= 0]
             if (tmp2.shape[0] == tmp.shape[0]):   # no short(all elements >= 0) 
                 tmp_return = np.dot(mytraining_data, tmp)
                 tmp_return_mean = np.mean(tmp_return)
-                if tmp_return_mean > mean_optimal:
+                tmp_return_sd = np.std(tmp_return)
+                sr = tmp_return_mean/max(tmp_return_sd, 1e-16)
+                if sr > sr_optimal:
                     tau_optimal_index = i
-                    mean_optimal = tmp_return_mean
+                    sr_optimal = sr
         x_optimal_year[:, year - year_start] = x_optimal_year_tau[:,tau_optimal_index ,year - year_start]
+        x_optim = x_optimal_year[:, year - year_start]
+        x_optim = x_optim[x_optim > 0]
+        num_assets[0,year - year_start] = x_optim.shape[0]
         tau_optimal_year[0,year - year_start] = taus[tau_optimal_index]
         monthly_return_year[:, year - year_start] = np.dot(mytest_data, x_optimal_year[:, year - year_start])
         monthly_return_equal_year[:, year - year_start] = mytest_data.mean(axis = 1)
+    np.savetxt('num_assets.csv', num_assets, delimiter=",")
     np.savetxt('x_optimal_year.csv', x_optimal_year, delimiter=",")
     np.savetxt('monthly_return_year.csv', monthly_return_year, delimiter=",")
     np.savetxt('tau_optimal_year.csv', tau_optimal_year, delimiter=",")
+    np.savetxt('monthly_return_equal_year.csv', monthly_return_equal_year, delimiter=",")
 
-    # plot the "best return" vs the return of the equally distributed portfolio
-
-    plt.plot(range(year_start, year_end), monthly_return_year.mean(axis = 0), label="Best sparse model")
-    plt.plot(range(year_start, year_end), monthly_return_equal_year.mean(axis = 0), label = "Equally distributed")
-    #plt.legend
-    plt.ylabel('Mean of monthly return')
-    plt.xlabel('Year')
-    plt.savefig('best_monthly_return.jpg')
-    plt.close("all")
-
-
-
-    
-    
+   
 
 
 
@@ -150,5 +145,4 @@ if __name__ == "__main__":
 
 
 
-
-
+        
