@@ -1,6 +1,8 @@
 # Setup -------------------------------------------------------------------
 library(ggplot2)
 library(dplyr)
+library(scales)
+library(reshape2)
 rm(list = ls())
 
 # Location of data and also where the plots will be saved
@@ -58,3 +60,27 @@ test <- ggplot(d[d$test == 1,], aes(y = return, x = risk, color = strategy)) +
        , caption = 'Source: Yahoo! Finance')
 ggsave(test, device = 'png', width = 8, height = 6, filename = paste0(DIR_LOC, 'test.png'))
 print(test)
+
+
+# Plot the bonds returns --------------------------------------------------
+
+d2 <- read.csv(paste0(DIR_LOC, 'Bonds86.csv'))
+d2 <- melt(d2, id.vars = 'Date')
+d2$Date2 <- as.POSIXct(d2$Date)
+old_names <- c('Date', 'Naive', 'Naive.w.o.NVR', 'Basic', 'Adjusted', 'Basic.Bond', 
+               'Bond.Ladder', 'Increasing.Bond', 'Increasing.Ladder')
+new_names <- c('Date', 'Naive_all', 'Naive', 'Basic', 'Adjusted', 'Basic Bond', 
+               'Bond Ladder', 'Increasing Bond', 'Increasing Ladder')
+d2$variable <- factor(d2$variable, levels = old_names, labels = new_names)
+# d2$shape <- 1
+# d2$shape <- ifelse(d2$variable %in% c('Naive'), 16, d2$shape) # filled circle
+# d2$shape <- ifelse(d2$variable %in% c('Single Opt', 'Basic Bonds', 'Increasing Ladder'), 15, d2$shape) # filled square
+# d2$shape <- ifelse(d2$variable %in% c('Multiperiod', 'Bond Ladder', 'Inceasing Bond'), 17, d2$shape) # filled triangle
+# d2$shape <- factor(d2$shape)
+
+ggplot(d2[d2$variable != 'Naive_all',], aes(x = Date2, y = value, group = variable, color = variable)) + 
+  geom_line() + 
+  geom_point(aes(shape = variable), size = 3) + 
+  scale_x_datetime(breaks = date_breaks('5 years'), labels = date_format('%Y')) + 
+  labs(x = '', y = 'Relative Return') + 
+  theme(legend.title = element_blank())
