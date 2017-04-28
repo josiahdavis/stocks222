@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 training_years = 5 # number of years used to estimate the expected return and covariance matrix
 test_years = 1 # number of years to keep the portfolio run
-year_start = 1996 # the first year to run the portfolio, 1991 because the data starts from 19860101
+year_start = 1991 # the first year to run the portfolio, 1991 because the data starts from 19860101
 year_offset = 1991
 year_end = 2016 # the last year to run the portfolio, not inclusive
 
@@ -16,7 +16,7 @@ def load_dataset():
        dataset shoule have the monthly return,
        each row for a given month,
        and each column for a given equity,
-       in the example, 360(months) * 201(equities)
+       in the example, 360(months) * 556(equities)
     '''
     mydata = np.genfromtxt ('monthly_return.csv', delimiter=",")
     return mydata

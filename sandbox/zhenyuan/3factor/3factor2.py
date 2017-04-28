@@ -56,7 +56,7 @@ def calc_return(x, monthly_return, year = 1988):
 
     
 
-def max_utility(market_cap_yearly, ME_yearly, btm_yearly, compounded_return_yearly, monthly_return, year = 1990, gamma = 5):
+def max_utility(market_cap_yearly, ME_yearly, btm_yearly, compounded_return_yearly, monthly_return, year = 1991, gamma = 5):
     '''
        year is the last year of training, i.e. the year before running the portfolio
     '''
@@ -191,6 +191,9 @@ if __name__ == "__main__":
     return_equal_yearly = np.zeros((12, year_end - year_start))
     return_optimal_yearly = np.zeros((12, year_end - year_start))
     return_equal_value_yearly = np.zeros((12, year_end - year_start))
+    x_equal_value_yearly = np.zeros((556, year_end - year_start))
+    x_equal_yearly = np.zeros((556, year_end - year_start))
+    x_optimal_yearly = np.zeros((556, year_end - year_start))
 
     for this_year in range(year_start, year_end):
         print('current year is ' + str(this_year))
@@ -204,33 +207,47 @@ if __name__ == "__main__":
         return_equal_value = calc_return(myx_equal_value, mymonthly_return, year = this_year)
         return_optimal = calc_return(myx_optimal, mymonthly_return, year = this_year)
         return_equal = calc_return(myx_equal, mymonthly_return, year = this_year)
+
         return_equal_value.shape = ((return_equal_value.shape[0], ))
         return_equal.shape = ((return_equal.shape[0], ))
         return_optimal.shape = ((return_optimal.shape[0], ))
+        myx_optimal.shape = (myx_optimal.shape[0], )
+        myx_equal_value.shape = (myx_equal_value.shape[0], )
+        myx_equal.shape = (myx_equal.shape[0], )
+
         return_equal_yearly[:, this_year - year_offset - 5] = return_equal
         return_equal_value_yearly[:, this_year - year_offset - 5] = return_equal_value
         return_optimal_yearly[:, this_year - year_offset - 5] = return_optimal
+        x_equal_value_yearly[:, this_year - year_offset - 5] = myx_equal_value
+        x_equal_yearly[:, this_year - year_offset - 5] = myx_equal
+        x_optimal_yearly[:, this_year - year_offset - 5] = myx_optimal
 
+    np.savetxt('return_optimal_yearly.csv', return_optimal_yearly, delimiter=",")
+    np.savetxt('return_equal_value_yearly.csv', return_equal_value_yearly, delimiter=",")
+    np.savetxt('return_equal_yearly.csv', return_equal_yearly, delimiter=",")
+    np.savetxt('x_equal_value_yearly.csv', x_equal_value_yearly, delimiter=",")
+    np.savetxt('x_equal_yearly.csv', x_equal_yearly, delimiter=",")
+    np.savetxt('x_optimal_yearly.csv', x_optimal_yearly, delimiter=",")
 
     
     #plt.plot(range(year_start, year_end), return_equal_value_yearly.mean(axis = 0), label="equal value")
-    plt.plot(range(year_start, year_end), return_optimal_yearly.mean(axis = 0), label="optimal")
-    plt.plot(range(year_start, year_end), return_equal_yearly.mean(axis = 0), label="equal")
-    plt.legend()
-    plt.ylabel('Average monthly return')
-    plt.xlabel('Year')
-    #plt.savefig('figure1.jpg', dpi = 600)
-    plt.show()
-    plt.close("all")
+    # plt.plot(range(year_start, year_end), return_optimal_yearly.mean(axis = 0), label="optimal")
+    # plt.plot(range(year_start, year_end), return_equal_yearly.mean(axis = 0), label="equal")
+    # plt.legend()
+    # plt.ylabel('Average monthly return')
+    # plt.xlabel('Year')
+    # #plt.savefig('figure1.jpg', dpi = 600)
+    # plt.show()
+    # plt.close("all")
 
-    plt.plot(range(year_start, year_end), return_optimal_yearly.std(axis = 0), label="optimal")
-    plt.plot(range(year_start, year_end), return_equal_yearly.std(axis = 0), label = "equal")
-    plt.legend()
-    plt.ylabel('Std of monthly return')
-    plt.xlabel('Year')
-    #plt.savefig('best_monthly_std.jpg', dpi=600)
-    plt.show()
-    plt.close("all")
+    # plt.plot(range(year_start, year_end), return_optimal_yearly.std(axis = 0), label="optimal")
+    # plt.plot(range(year_start, year_end), return_equal_yearly.std(axis = 0), label = "equal")
+    # plt.legend()
+    # plt.ylabel('Std of monthly return')
+    # plt.xlabel('Year')
+    # #plt.savefig('best_monthly_std.jpg', dpi=600)
+    # plt.show()
+    # plt.close("all")
 
 
 
