@@ -10,10 +10,10 @@ DIR_LOC <- '/Users/josiahdavis/Documents/Berkeley/STAT222/data/'
 
 # Read data and formatting ------------------------------------------------
 
-d <- read.csv(paste0(DIR_LOC, 'results.csv'))
+d <- read.csv(paste0(DIR_LOC, 'factor_results.csv'))
 
 d$strategy <- factor(d$strategy, levels = c(0, 1, 2)
-                     , labels = c('Equal Weight', 'Minimize Risk', 'Maximize Returns'))
+                     , labels = c('Equal Weight', 'Minimize Risk', 'Factor'))
 
 d$period_train <- factor(d$period
                          , levels = c(1, 2, 3, 4, 5)
